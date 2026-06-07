@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   web:
     build: .
@@ -15,7 +16,7 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ecourses
       MYSQL_USER: ecourses_user
       MYSQL_PASSWORD: ecourses_pass
