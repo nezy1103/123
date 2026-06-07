@@ -1,19 +1,19 @@
 FROM php:8.2-apache
 
-# Устанавливаем PDO
+# Устанавливаем PDO для MySQL
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Включаем mod_rewrite
+# Включаем mod_rewrite для ЧПУ
 RUN a2enmod rewrite
 
-# Создаём директорию и копируем конфиг
+# Создаём директорию и копируем конфиг Apache
 RUN mkdir -p /var/www/html/public
 COPY apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# Копируем все файлы
+# Копируем весь код проекта
 COPY . /var/www/html/
 
-# Устанавливаем правильные права
+# Устанавливаем правильные права доступа
 RUN chown -R www-data:www-data /var/www/html \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && find /var/www/html -type f -exec chmod 644 {} \; \
