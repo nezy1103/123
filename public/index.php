@@ -1,80 +1,61 @@
 <?php
 session_start();
-require_once __DIR__ . '/../src/config/db.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-spl_autoload_register(function($class) {
-    $paths = [
-        __DIR__ . "/../src/controllers/{$class}.php",
-        __DIR__ . "/../src/models/{$class}.php"
-    ];
-    foreach ($paths as $path) {
-        if (file_exists($path)) {
-            require $path;
-            return;
-        }
+use app\controllers\AuthController;
+use app\controllers\CourseController;
+use app\controllers\SubscriptionController;
+
+$page = $_GET['page'] ?? 'home';
+
+// Функция проверки авторизации
+function isLoggedIn() {
+    return isset($_SESSION['user']) && is_array($_SESSION['user']);
+}
+
+// Функция проверки роли
+function hasRole($role) {
+    return isLoggedIn() && $_SESSION['user']['role'] === $role;
+}
+
+// Простой CSRF-генератор (для форм)
+function csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-});
+    return $_SESSION['csrf_token'];
+}
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = ltrim($uri, '/');
-
-switch ($uri) {
-    case 'auth/login':
-        $ctrl = new AuthController();
-        $ctrl->login();
+switch ($page) {
+    case 'register':
+        $controller = new AuthController();
+        $controller->register();
         break;
-    case 'auth/register':
-        $ctrl = new AuthController();
-        $ctrl->register();
+    case 'login':
+        $controller = new AuthController();
+        $controller->login();
         break;
-    case 'auth/logout':
-        $ctrl = new AuthController();
-        $ctrl->logout();
+    case 'logout':
+        $controller = new AuthController();
+        $controller->logout();
         break;
-    case 'teacher/dashboard':
-        $ctrl = new CourseController();
-        $ctrl->dashboard();
+    case 'dashboard':
+        if (!isLoggedIn()) {
+            header('Location: /?page=login');
+            exit;
+        }
+        // Подключаем view дашборда
+        require_once __DIR__ . '/../views/dashboard.php';
         break;
-    case 'teacher/create':
-        $ctrl = new CourseController();
-        $ctrl->create();
-        break;
-    case (preg_match('/teacher\/edit\/(\d+)/', $uri, $matches) ? true : false):
-        $ctrl = new CourseController();
-        $ctrl->edit($matches[1]);
-        break;
-    case (preg_match('/teacher\/delete\/(\d+)/', $uri, $matches) ? true : false):
-        $ctrl = new CourseController();
-        $ctrl->delete($matches[1]);
-        break;
-    case 'student/dashboard':
-        $ctrl = new StudentController();
-        $ctrl->dashboard();
-        break;
-    case (preg_match('/student\/subscribe\/(\d+)/', $uri, $matches) ? true : false):
-        $ctrl = new StudentController();
-        $ctrl->subscribe($matches[1]);
-        break;
-    case (preg_match('/student\/unsubscribe\/(\d+)/', $uri, $matches) ? true : false):
-        $ctrl = new StudentController();
-        $ctrl->unsubscribe($matches[1]);
-        break;
-    case (preg_match('/report\/teacher\/(\d+)/', $uri, $matches) ? true : false):
-        $ctrl = new ReportController();
-        $ctrl->teacher($matches[1]);
-        break;
-    case 'report/student':
-        $ctrl = new ReportController();
-        $ctrl->student();
+    case 'courses':
+        // Пример для преподавателя
+        if (!hasRole('teacher')) {
+            die('Доступ запрещён');
+        }
+        $controller = new CourseController();
+        $controller->index();
         break;
     default:
-        if (isset($_SESSION['user'])) {
-            $role = $_SESSION['user']['role'];
-            header("Location: /{$role}/dashboard");
-            exit();
-        } else {
-            echo "<h1>E-Course MVP</h1>";
-            echo "<a href='/auth/login'>Войти</a> | ";
-            echo "<a href='/auth/register'>Регистрация</a>";
-        }
+        require_once __DIR__ . '/../views/home.php';
+        break;
 }
