@@ -1,16 +1,27 @@
 <?php
 require_once __DIR__.'/../config/db.php';
+
 class User {
-    private $pdo;
-    public function __construct() { $this->pdo = Database::getInstance()->getConnection(); }
-    public function register($name,$email,$password,$role='student') {
-        return $this->pdo->prepare("INSERT INTO users(name,email,password,role)VALUES(?,?,?,?)")
-            ->execute([$name,$email,password_hash($password,PASSWORD_DEFAULT),$role]);
+    private $db;
+    
+    public function __construct() {
+        $this->db = Database::getInstance()->getConnection();
     }
-    public function login($email,$password) {
-        $stmt=$this->pdo->prepare("SELECT * FROM users WHERE email=?");
-        $stmt->execute([$email]); $u=$stmt->fetch();
-        if($u && password_verify($password,$u['password'])){ unset($u['password']); return $u; }
+    
+    public function login($email, $password) {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+        }
         return false;
+    }
+    
+    public function register($name, $email, $password, $role) {
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$name, $email, $hashed, $role]);
     }
 }
