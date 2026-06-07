@@ -4,12 +4,14 @@ class Database {
     private $pdo;
     
     private function __construct() {
-        $host = getenv('DB_HOST') ?: 'mysql';
-        $db = getenv('DB_NAME') ?: 'ecourses';
-        $user = getenv('DB_USER') ?: 'root';
-        $pass = getenv('DB_PASS') ?: 'root';
+        $host = $_ENV['DB_HOST'] ?? 'db';
+        $db   = $_ENV['DB_NAME'] ?? 'ecourses';
+        $user = $_ENV['DB_USER'] ?? 'ecourses_user';
+        $pass = $_ENV['DB_PASS'] ?? 'ecourses_pass';
+        
         $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-        $this->pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $this->pdo = new PDO($dsn, $user, $pass);
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     
     public static function getInstance() {
@@ -19,7 +21,7 @@ class Database {
         return self::$instance;
     }
     
-    public function getConnection() { 
-        return $this->pdo; 
+    public function getConnection() {
+        return $this->pdo;
     }
 }
