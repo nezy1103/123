@@ -7,7 +7,7 @@ class Database {
         $host = getenv('DB_HOST') ?: 'mysql';
         $db = getenv('DB_NAME') ?: 'ecourses';
         $user = getenv('DB_USER') ?: 'root';
-        $pass = getenv('DB_PASSWORD') ?: 'root';
+        $pass = getenv('DB_PASS') ?: 'root';
         $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
         $this->pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     }
