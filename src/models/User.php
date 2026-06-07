@@ -1,23 +1,27 @@
 <?php
+namespace app\models;
+
+use app\core\Database;
+
 class User {
-    private $db;
+    private $pdo;
+
     public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+        $this->pdo = Database::getInstance()->getConnection();
     }
-    
-    public function login($email, $password) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+
+    public function findByEmail($email) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($user && password_verify($password, $user['password'])) {
-            return $user;
+        return $stmt->fetch();
+    }
+
+    public function create($name, $email, $password, $role = 'student') {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+        if ($stmt->execute([$name, $email, $hash, $role])) {
+            return $this->pdo->lastInsertId();
         }
         return false;
-    }
-    
-    public function register($name, $email, $password, $role) {
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-        return $stmt->execute([$name, $email, $hashed, $role]);
     }
 }
