@@ -1,8 +1,10 @@
 <?php
 session_start();
-spl_autoload_register(fn($c)=>file_exists($f=__DIR__."/../src/controllers/{$c}.php")&&require$f||file_exists($f=__DIR__."/../src/models/{$c}.php")&&require$f);
+spl_autoload_register(fn($c) => file_exists($f = __DIR__ . "/../src/controllers/{$c}.php") && require $f || file_exists($f = __DIR__ . "/../src/models/{$c}.php") && require $f);
 
-$uri=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri = str_replace('/public', '', $uri); // Убираем /public из пути
+
 $routes=[
     ''=>['AuthController','login'], // главная -> логин
     'auth/login'=>['AuthController','login'],
@@ -18,6 +20,7 @@ $routes=[
     'report/teacher'=>['ReportController','teacher'],
     'report/student'=>['ReportController','student'],
 ];
+
 $parts=explode('/',trim($uri,'/')); $key=implode('/',$parts); $id=end($parts);
 $r=$routes[$key]??null;
 
