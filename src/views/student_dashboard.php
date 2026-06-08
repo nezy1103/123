@@ -19,7 +19,7 @@
     <a href="/auth/logout">🚪 Выйти</a> | 
     <a href="/report/student">🏆 Топ курсов</a></p>
 
-    <h3>📚 Мои курсы (<?= count($my) ?>)</h3>
+    <h3> Мои курсы (<?= count($my) ?>)</h3>
     <?php if (empty($my)): ?>
         <p>Вы пока не подписаны ни на один курс.</p>
     <?php else: ?>
@@ -34,7 +34,7 @@
         </ul>
     <?php endif; ?>
 
-    <h3> Все доступные курсы</h3>
+    <h3>📖 Все доступные курсы</h3>
     <ul>
         <?php foreach ($courses as $c): 
             $sub = false;
@@ -54,7 +54,7 @@
                     <span class="subscribed">✅ Подписан</span>
                     <a href="/student/unsubscribe?id=<?= $c['id'] ?>">Отписаться</a>
                 <?php else: ?>
-                    <a href="/student/subscribe?id=<?= $c['id'] ?>">➕ Подписаться</a>
+                    <a href="/student/subscribe?id=<?= $c['id'] ?>"> Подписаться</a>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
