@@ -25,4 +25,4 @@
 ## 🚀 Запуск
 ```bash
 docker-compose up -d --build
-Приложение доступно: http://localhost:8080
+Приложение доступно: http://localhost:8080/public
