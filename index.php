@@ -1,5 +1,5 @@
 <?php
-// index.php - Front Controller
+// index.php - Front Controller (FINAL VERSION)
 session_start();
 
 // Автозагрузка классов
@@ -21,8 +21,11 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 $parts = explode('/', $uri);
 
-// Извлекаем ID из query string (если есть)
+// Извлекаем ID: сначала из query string, потом из пути
 $id = $_GET['id'] ?? null;
+if ($id === null && count($parts) >= 3 && is_numeric($parts[2])) {
+    $id = $parts[2];
+}
 
 // Маршрутизация
 $controllerName = 'AuthController';
@@ -43,15 +46,15 @@ if ($uri === '' || $uri === 'index.php') {
 } elseif ($parts[0] === 'teacher') {
     $controllerName = 'CourseController';
     $actionName = $parts[1] ?? 'dashboard';
-    if ($id !== null) $params[] = $id; // ID из ?id=...
+    if ($id !== null) $params[] = $id;
 } elseif ($parts[0] === 'student') {
     $controllerName = 'StudentController';
     $actionName = $parts[1] ?? 'dashboard';
-    if ($id !== null) $params[] = $id; // ID из ?id=...
+    if ($id !== null) $params[] = $id;
 } elseif ($parts[0] === 'report') {
     $controllerName = 'ReportController';
     $actionName = $parts[1] ?? 'student';
-    if ($id !== null) $params[] = $id; // ID из ?id=...
+    if ($id !== null) $params[] = $id;
 }
 
 // Вызов контроллера
