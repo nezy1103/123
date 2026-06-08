@@ -1,11 +1,9 @@
+DirectoryIndex index.php
 RewriteEngine On
 
-# Если запрашиваемый файл или папка реально существуют - отдаем их
+# Если файл или папка существуют — отдаем их
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Иначе перенаправляем все запросы на index.php
+# Иначе перенаправляем всё на index.php
 RewriteRule ^(.*)$ index.php [QSA,L]
-
-# Запрещаем просмотр списка файлов
-Options -Indexes
