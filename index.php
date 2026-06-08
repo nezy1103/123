@@ -1,5 +1,5 @@
 <?php
-// index.php - Front Controller (лежит в корне проекта)
+// index.php - Front Controller
 session_start();
 
 // Автозагрузка классов
@@ -16,23 +16,17 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Получаем URI без домена и query string
+// Получаем URI
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Убираем слэши в начале и конце
 $uri = trim($uri, '/');
-
-// Разбиваем на части
 $parts = explode('/', $uri);
 
-// Определяем контроллер и действие
-$controllerName = 'AuthController'; // По умолчанию
-$actionName = 'login';              // По умолчанию
+// Маршрутизация
+$controllerName = 'AuthController';
+$actionName = 'login';
 $params = [];
 
-// Простая маршрутизация
 if ($uri === '' || $uri === 'index.php') {
-    // Главная страница -> редирект на вход или дашборд
     if (isset($_SESSION['user'])) {
         header('Location: ' . ($_SESSION['user']['role'] === 'teacher' ? '/teacher/dashboard' : '/student/dashboard'));
         exit;
@@ -46,29 +40,28 @@ if ($uri === '' || $uri === 'index.php') {
 } elseif ($parts[0] === 'teacher') {
     $controllerName = 'CourseController';
     $actionName = $parts[1] ?? 'dashboard';
-    if (isset($parts[2])) $params[] = $parts[2]; // ID курса
+    if (isset($parts[2])) $params[] = $parts[2];
 } elseif ($parts[0] === 'student') {
     $controllerName = 'StudentController';
     $actionName = $parts[1] ?? 'dashboard';
-    if (isset($parts[2])) $params[] = $parts[2]; // ID курса
+    if (isset($parts[2])) $params[] = $parts[2];
 } elseif ($parts[0] === 'report') {
     $controllerName = 'ReportController';
-    $actionName = $parts[1] ?? 'student'; // student или teacher
-    if (isset($parts[2])) $params[] = $parts[2]; // ID курса для отчета учителя
+    $actionName = $parts[1] ?? 'student';
+    if (isset($parts[2])) $params[] = $parts[2];
 }
 
 // Вызов контроллера
 if (class_exists($controllerName)) {
     $controller = new $controllerName();
     if (method_exists($controller, $actionName)) {
-        // Передаем параметры, если есть
         if (!empty($params)) {
             call_user_func_array([$controller, $actionName], $params);
         } else {
             $controller->$actionName();
         }
     } else {
-        echo "Действие '$actionName' не найдено в контроллере '$controllerName'";
+        echo "Действие '$actionName' не найдено";
     }
 } else {
     echo "Контроллер '$controllerName' не найден";
