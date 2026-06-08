@@ -32,11 +32,19 @@ class AuthController {
             $password = $_POST['password'] ?? '';
             $role = $_POST['role'] ?? 'student';
 
-            if ($this->m->register($name, $email, $password, $role)) {
-                header('Location: /auth/login');
-                exit;
+            try {
+                if ($this->m->register($name, $email, $password, $role)) {
+                    header('Location: /auth/login');
+                    exit;
+                }
+            } catch (PDOException $e) {
+                // Проверяем, является ли ошибка дубликатом email
+                if ($e->getCode() == 23000 && strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'email') !== false) {
+                    $error = "Пользователь с таким email уже существует!";
+                } else {
+                    $error = "Ошибка регистрации: " . $e->getMessage();
+                }
             }
-            $error = "Ошибка регистрации";
         }
         require __DIR__.'/../views/register.php';
     }
