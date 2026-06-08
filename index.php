@@ -1,5 +1,5 @@
 <?php
-// index.php - Front Controller (FINAL VERSION)
+// index.php - Front Controller (FINAL WORKING VERSION)
 session_start();
 
 // Автозагрузка классов
