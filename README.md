@@ -73,3 +73,11 @@
 ```bash
 git clone https://github.com/nezy1103/123.git
 cd 123
+
+2. Запустите приложение:
+
+docker-compose up -d --build
+
+3. Откройте браузер:
+
+http://localhost:8080
