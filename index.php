@@ -16,10 +16,13 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Получаем URI
+// Получаем URI без домена и query string
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 $parts = explode('/', $uri);
+
+// Извлекаем ID из query string (если есть)
+$id = $_GET['id'] ?? null;
 
 // Маршрутизация
 $controllerName = 'AuthController';
@@ -40,15 +43,15 @@ if ($uri === '' || $uri === 'index.php') {
 } elseif ($parts[0] === 'teacher') {
     $controllerName = 'CourseController';
     $actionName = $parts[1] ?? 'dashboard';
-    if (isset($parts[2])) $params[] = $parts[2];
+    if ($id !== null) $params[] = $id; // ID из ?id=...
 } elseif ($parts[0] === 'student') {
     $controllerName = 'StudentController';
     $actionName = $parts[1] ?? 'dashboard';
-    if (isset($parts[2])) $params[] = $parts[2];
+    if ($id !== null) $params[] = $id; // ID из ?id=...
 } elseif ($parts[0] === 'report') {
     $controllerName = 'ReportController';
     $actionName = $parts[1] ?? 'student';
-    if (isset($parts[2])) $params[] = $parts[2];
+    if ($id !== null) $params[] = $id; // ID из ?id=...
 }
 
 // Вызов контроллера
@@ -61,7 +64,7 @@ if (class_exists($controllerName)) {
             $controller->$actionName();
         }
     } else {
-        echo "Действие '$actionName' не найдено";
+        echo "Действие '$actionName' не найдено в контроллере '$controllerName'";
     }
 } else {
     echo "Контроллер '$controllerName' не найден";
