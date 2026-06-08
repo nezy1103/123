@@ -1,12 +1,12 @@
 <?php
-// public/index.php
+// index.php - Front Controller (лежит в корне проекта)
 session_start();
 
-// Автозагрузка
+// Автозагрузка классов
 spl_autoload_register(function ($class) {
     $paths = [
-        __DIR__ . "/../src/controllers/{$class}.php",
-        __DIR__ . "/../src/models/{$class}.php"
+        __DIR__ . "/src/controllers/{$class}.php",
+        __DIR__ . "/src/models/{$class}.php"
     ];
     foreach ($paths as $path) {
         if (file_exists($path)) {
